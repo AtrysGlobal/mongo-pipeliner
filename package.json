@@ -1,6 +1,6 @@
 {
   "name": "mongo-pipeliner",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A practical and userful set of tools to help you build and test MongoDB aggregation pipelines.",
   "keywords": [
     "mongodb",
@@ -13,7 +13,8 @@
   ],
   "author": "Atrys Health.",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/index",
+  "types": "dist/index",
   "files": [
     "dist/**/*"
   ],
