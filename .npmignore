@@ -1,0 +1,20 @@
+# package directories
+node_modules
+jspm_packages
+
+examples
+shared
+
+__test__
+__tests__
+__mock__
+__mocks__
+lib/**
+tsconfig.json
+tslint.json
+.prettierrc
+.nvmrc
+.eslintignore
+.eslintrc.js
+.mocharc.json
+index.ts
