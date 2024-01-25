@@ -23,9 +23,6 @@ export interface IProtoPipelineBuilder {
 }
 
 export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
-  // pipeline: PipelineStage[];
-  // collection?: Model<T>;
-
   /**
    * Filters the documents to pass only
    * those that match the specified conditions.
@@ -76,7 +73,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
   /**
    * Adds new fields to documents.
    *
-   * @param payload - The query in the $set stage
+   * @param {*} payload - The query in the $set stage
    *
    */
   set(payload: { [k: string]: any }): void;
@@ -148,16 +145,70 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    */
   facet(params: { [k: string]: any }): void;
 
+  /**
+   * Perform a join with another collection.
+   * It can be used to combine documents from two collections.
+   * This method allows you to specify a custom pipeline
+   * to execute on the joined collection.
+   *
+   * @param {string} collectionName - Collection to join
+   * @param {string} localField - Field from the input documents
+   * @param {string} matchExpression - Filter condition for the documents of the "from" collection
+   * @param {string} projection - Specifies the fields to return in the documents of the "from" collection
+   * @param {string} as - Name of the new array field to add to the input documents
+   * @returns {AggregationPipelineBuilder}
+   *
+   * @example
+   *
+   * const pipeliner = new AggregationPipelineBuilder();
+   * const result = pipeliner
+   *  .customLookup({
+   *    collectionName: 'bookings',
+   *    localField: 'bookingId',
+   *    matchExpression: { $eq: ['$_id', '$$bookingId'] },
+   *    projection: { _id: 0, name: 1, date: 1 },
+   *    as: 'bookings',
+   * })
+   */
   customLookup(params: ICustomLookupStageParams): void;
 
+  /**
+   * Perform a join with another collection.
+   * It can be used to combine documents from two collections.
+   * This method allows you to specify a custom pipeline
+   * to execute on the joined collection.
+   *
+   * It also unwind the joined collection automatically.
+   *
+   *
+   * @param {string} collectionName - Collection to join
+   * @param {string} localField - Field from the input documents
+   * @param {string} matchExpression - Filter condition for the documents of the "from" collection
+   * @param {string} projection - Specifies the fields to return in the documents of the "from" collection
+   * @param {string} as - Name of the new array field to add to the input documents
+   * @returns {AggregationPipelineBuilder}
+   *
+   * @example
+   *
+   * const pipeliner = new AggregationPipelineBuilder();
+   * const result = pipeliner
+   *  .customUnwindLookup({
+   *    collectionName: 'bookings',
+   *    localField: 'bookingId',
+   *    matchExpression: { $eq: ['$_id', '$$bookingId'] },
+   *    projection: { _id: 0, name: 1, date: 1 },
+   *    as: 'bookings',
+   * })
+   */
   customUnwindLookup(params: ICustomLookupStageParams): void;
 
   /**
    * Builds a pipeline that will paginate the results
    * according to a limit and page number (skip).
    *
-   * @param limit
-   * @param page
+   * @param {number} limit - The query in the $limit stage
+   * @param {number} page - The query in the $skip stage
+   *
    */
   paginate(limit: number, page: number): void;
 }

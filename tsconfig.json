@@ -7,13 +7,12 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "ts-node": {
     "esm": true,
-    "experimentalSpecifierResolution": "node"
+    "experimentalSpecifierResolution": "node",
   },
-  //   "include": ["lib/**/*"],
   "include": ["index.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "__test__"],
 }
