@@ -9,3 +9,7 @@
 ## [0.1.1] - 2024-01-25
 
 - Enhanced source code documentation
+
+## [0.1.2] - 2024-01-25
+
+- Adding module types to package.json
