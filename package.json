@@ -1,6 +1,6 @@
 {
   "name": "mongo-pipeliner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A practical and userful set of tools to help you build and test MongoDB aggregation pipelines.",
   "keywords": [
     "mongodb",
