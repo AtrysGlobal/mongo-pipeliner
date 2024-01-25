@@ -1,6 +1,6 @@
 import { AggregationPipelineBuilder } from '../lib/base/pipeline-builder';
 import mongoose from 'mongoose';
-import { UserSchema } from './schema';
+import { UserSchema } from '../shared/schema';
 
 const User = mongoose.model('User', UserSchema);
 

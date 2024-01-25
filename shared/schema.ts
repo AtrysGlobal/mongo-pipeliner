@@ -5,6 +5,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  last_name: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -13,6 +17,13 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+  ip: {
+    type: String,
+  },
+  is_verified: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,

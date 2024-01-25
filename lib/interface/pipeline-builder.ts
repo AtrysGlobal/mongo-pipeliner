@@ -1,4 +1,4 @@
-import { Document, Model, PipelineStage } from 'mongoose';
+import { PipelineStage } from 'mongoose';
 
 export interface IProtoPipelineBuilder {
   /**
@@ -33,7 +33,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param match - The query in the $match stage
    *
    */
-  match(match: { [k: string]: any });
+  match(match: { [k: string]: any }): void;
 
   /**
    * Groups documents by some specified key
@@ -44,7 +44,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param group - The query in the $group stage
    *
    */
-  group(group: { _id: string; [k: string]: any });
+  group(group: { _id: string; [k: string]: any }): void;
 
   /**
    * Sort documents by one or more fields.
@@ -52,7 +52,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param sort - The query in the $sort stage
    *
    */
-  sort(sort: { [k: string]: 1 | -1 });
+  sort(sort: { [k: string]: 1 | -1 }): void;
 
   /**
    * Limits the number of documents passed
@@ -61,7 +61,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {number} limit - The query in the $limit stage
    *
    */
-  limit(limit: number);
+  limit(limit: number): void;
 
   /**
    * Skips over a specified number of documents
@@ -71,7 +71,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {number} skip - The query in the $skip stage
    *
    */
-  skip(skip: number);
+  skip(skip: number): void;
 
   /**
    * Adds new fields to documents.
@@ -79,7 +79,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param payload - The query in the $set stage
    *
    */
-  set(payload: { [k: string]: any });
+  set(payload: { [k: string]: any }): void;
 
   /**
    * Removes/excludes fields from documents.
@@ -87,7 +87,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {string | string[]} prop - The query in the $unset stage
    *
    */
-  unset(prop: string | string[]);
+  unset(prop: string | string[]): void;
 
   /**
    * Reshapes each document in the stream,
@@ -96,7 +96,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param projection - The query in the $project stage
    *
    */
-  project(projection: { [k: string]: any });
+  project(projection: { [k: string]: any }): void;
 
   /**
    * Counts the number of documents input to the stage.
@@ -104,7 +104,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {string} count - The query in the $count stage
    *
    */
-  count(count: string);
+  count(count: string): void;
 
   /**
    * Writes the resulting documents of the aggregation pipeline
@@ -113,7 +113,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    *
    * @param {string} collectionName - The query in the $out stage
    */
-  out(collectionName: string);
+  out(collectionName: string): void;
 }
 
 export interface ILookupStageParams {
@@ -138,7 +138,7 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    *
    * @param params - The query in the $lookup stage
    */
-  lookup(params: ILookupStageParams);
+  lookup(params: ILookupStageParams): void;
 
   /**
    * Process a set of input documents in multiple different ways,
@@ -146,11 +146,11 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    *
    * @param params - The query in the $lookup stage
    */
-  facet(params: { [k: string]: any });
+  facet(params: { [k: string]: any }): void;
 
-  customLookup(params: ICustomLookupStageParams);
+  customLookup(params: ICustomLookupStageParams): void;
 
-  customUnwindLookup(params: ICustomLookupStageParams);
+  customUnwindLookup(params: ICustomLookupStageParams): void;
 
   /**
    * Builds a pipeline that will paginate the results
@@ -159,5 +159,5 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    * @param limit
    * @param page
    */
-  paginate(limit: number, page: number);
+  paginate(limit: number, page: number): void;
 }

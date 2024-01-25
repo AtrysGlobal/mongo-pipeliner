@@ -95,7 +95,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
     this.pipeline.push({
       $lookup: {
         from: params.collectionName,
-        let: { localField: `$${params.localField}` },
+        let: { [params.localField]: `$${params.localField}` },
         pipeline: lookup_pipeline,
         as: params.as,
       },
@@ -103,6 +103,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
 
     return this;
   }
+
   customUnwindLookup(params: ICustomLookupStageParams) {
     this.customLookup(params);
     this.pipeline.push({ $unwind: { path: `$${params.as}`, preserveNullAndEmptyArrays: true } });

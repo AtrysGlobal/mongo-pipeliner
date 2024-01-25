@@ -1,0 +1,5 @@
+{
+  "extensions": ["ts"],
+  "spec": ["__test__/**/*.spec.*"],
+  "node-option": ["experimental-specifier-resolution=node", "loader=ts-node/esm"]
+}
