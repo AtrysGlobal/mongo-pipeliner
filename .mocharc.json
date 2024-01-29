@@ -1,5 +1,7 @@
 {
   "extensions": ["ts"],
-  "spec": ["__test__/**/*.spec.*"],
-  "node-option": ["experimental-specifier-resolution=node", "loader=ts-node/esm"]
+  "spec": ["__test__/**/*.spec.ts"],
+  "package": "./package.json",
+  "loader": "ts-node/esm",
+  "require": ["ts-node/register"]
 }

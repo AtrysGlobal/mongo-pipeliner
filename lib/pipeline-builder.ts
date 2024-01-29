@@ -1,8 +1,4 @@
-import {
-  ICustomLookupStageParams,
-  IDetailedAggregationPipelineBuilder,
-  ILookupStageParams,
-} from '../interfaces/pipeline-builder';
+import { ICustomLookupStageParams, IDetailedAggregationPipelineBuilder, ILookupStageParams } from './types';
 import { Model, PipelineStage } from 'mongoose';
 
 /**
