@@ -1,7 +1,0 @@
-{
-  "extensions": ["ts"],
-  "spec": ["__test__/**/*.spec.ts"],
-  "package": "./package.json",
-  "loader": "ts-node/esm",
-  "require": ["ts-node/register"]
-}
