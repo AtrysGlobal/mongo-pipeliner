@@ -1,8 +1,7 @@
-import { expect } from 'chai';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { UserSchema } from '../shared/schema';
-import { AggregationPipelineBuilder } from '../lib/base/pipeline-builder';
+import { AggregationPipelineBuilder } from '../lib/pipeline-builder';
 import { readFileSync } from 'fs';
 
 describe('Mongo Pipeliner Main Tests', () => {
@@ -10,7 +9,7 @@ describe('Mongo Pipeliner Main Tests', () => {
   let mockElements: any[] = [];
   let User: mongoose.Model<any>;
 
-  before(async () => {
+  beforeEach(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
 
@@ -25,7 +24,7 @@ describe('Mongo Pipeliner Main Tests', () => {
     }
   });
 
-  after(async () => {
+  afterEach(async () => {
     try {
       await mongoose.disconnect();
       await mongoServer.stop();
@@ -40,10 +39,10 @@ describe('Mongo Pipeliner Main Tests', () => {
     const countResult = await pipeliner.match({ is_verified: true }).count('total').execute();
     console.log('Result: ', countResult);
 
-    expect(countResult).to.be.an('array');
-    expect(countResult).to.have.lengthOf(1);
-    expect(countResult[0]).to.have.property('total');
-    expect(countResult[0].total).to.equal(mockElements.filter((e) => e.is_verified).length);
+    expect(Array.isArray(countResult)).toBeTruthy();
+    expect(countResult.length).toEqual(1);
+    expect(countResult[0]).toHaveProperty('total');
+    expect(countResult[0].total).toEqual(mockElements.filter((e) => e.is_verified).length);
   });
 
   it('Complex pipeline have expected structure', () => {
@@ -81,9 +80,9 @@ describe('Mongo Pipeliner Main Tests', () => {
       .unset('_id')
       .assemble();
 
-    expect(result).to.be.an('array');
-    expect(result).to.have.lengthOf(expectedPipeline.length);
-    expect(result).to.deep.equal(expectedPipeline);
+    expect(Array.isArray(result)).toBeTruthy();
+    expect(result.length).toEqual(expectedPipeline.length);
+    expect(result).toEqual(expectedPipeline);
   });
 
   //Write another test for this
@@ -92,9 +91,9 @@ describe('Mongo Pipeliner Main Tests', () => {
 
     const paginatedResult = await pipeliner.match({ is_verified: true }).paginate(10, 1).execute();
 
-    expect(paginatedResult).to.be.an('array');
-    expect(paginatedResult).to.have.lengthOf(10);
-    expect(paginatedResult[0]).to.have.property('is_verified');
-    expect(paginatedResult[0].is_verified).to.be.true;
+    expect(Array.isArray(paginatedResult)).toBeTruthy();
+    expect(paginatedResult.length).toEqual(10);
+    expect(paginatedResult[0]).toHaveProperty('is_verified');
+    expect(paginatedResult[0].is_verified).toBeTruthy();
   });
 });
