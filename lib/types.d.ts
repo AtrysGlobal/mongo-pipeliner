@@ -122,7 +122,7 @@ export interface ILookupStageParams {
 
 export interface ICustomLookupStageParams {
   collectionName: string;
-  localField: { name: string; alias: string } | string;
+  localField: { ref: string; alias: string } | string;
   matchExpression?: { [k: string]: any };
   projection?: { [k: string]: any };
   as: string;

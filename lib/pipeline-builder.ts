@@ -241,7 +241,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
         from: params.collectionName,
         let: {
           [typeof params.localField === 'string' ? params.localField : params.localField.alias]:
-            `$${params.localField}`,
+            `$${typeof params.localField === 'string' ? params.localField : params.localField.ref}`,
         },
         pipeline: lookup_pipeline,
         as: params.as,
