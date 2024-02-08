@@ -239,7 +239,10 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
     this.pipeline.push({
       $lookup: {
         from: params.collectionName,
-        let: { [params.localField]: `$${params.localField}` },
+        let: {
+          [typeof params.localField === 'string' ? params.localField : params.localField.alias]:
+            `$${params.localField}`,
+        },
         pipeline: lookup_pipeline,
         as: params.as,
       },
