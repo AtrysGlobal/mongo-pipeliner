@@ -23,3 +23,4 @@
 ## [0.1.4] - 2024-02-08
 
 - Enhance custom loookup tools
+- Adding Tests for custom lookup tools

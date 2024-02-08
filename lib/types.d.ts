@@ -169,6 +169,23 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    *    projection: { _id: 0, name: 1, date: 1 },
    *    as: 'bookings',
    * })
+   *
+   * // In case you need to implement an alias for 'composed' localField
+   * // Just ensure to use the 'alias' property in the matchExpression object
+   *
+   * const pipeliner = new AggregationPipelineBuilder();
+   * const result = pipeliner
+   * .customLookup({
+   *  collectionName: 'authors',
+   *  localField: {
+   *    ref: 'author.refId',
+   *    alias: 'authorId',
+   *  },
+   *  matchExpression: { $eq: ['$_id', '$$authorId'] },
+   *  projection: { _id: 0, name: 1, date: 1 },
+   *  as: 'author',
+   * })
+   *
    */
   customLookup(params: ICustomLookupStageParams): void;
 
@@ -199,6 +216,23 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    *    projection: { _id: 0, name: 1, date: 1 },
    *    as: 'bookings',
    * })
+   *
+   * // In case you need to implement an alias for 'composed' localField
+   * // Just ensure to use the 'alias' property in the matchExpression object
+   *
+   * const pipeliner = new AggregationPipelineBuilder();
+   * const result = pipeliner
+   * .customLookup({
+   *  collectionName: 'authors',
+   *  localField: {
+   *    ref: 'author.refId',
+   *    alias: 'authorId',
+   *  },
+   *  matchExpression: { $eq: ['$_id', '$$authorId'] },
+   *  projection: { _id: 0, name: 1, date: 1 },
+   *  as: 'author',
+   * })
+   *
    */
   customUnwindLookup(params: ICustomLookupStageParams): void;
 
