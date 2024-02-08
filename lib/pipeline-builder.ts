@@ -225,6 +225,23 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    *    projection: { _id: 0, name: 1, date: 1 },
    *    as: 'bookings',
    * })
+   *
+   * // In case you need to implement an alias for 'composed' localField
+   * // Just ensure to use the 'alias' property in the matchExpression object
+   *
+   * const pipeliner = new AggregationPipelineBuilder();
+   * const result = pipeliner
+   * .customLookup({
+   *  collectionName: 'authors',
+   *  localField: {
+   *    ref: 'author.refId',
+   *    alias: 'authorId',
+   *  },
+   *  matchExpression: { $eq: ['$_id', '$$authorId'] },
+   *  projection: { _id: 0, name: 1, date: 1 },
+   *  as: 'author',
+   * })
+   *
    */
   customLookup(params: ICustomLookupStageParams): AggregationPipelineBuilder {
     const lookup_pipeline: any[] = [];
@@ -239,7 +256,10 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
     this.pipeline.push({
       $lookup: {
         from: params.collectionName,
-        let: { [params.localField]: `$${params.localField}` },
+        let: {
+          [typeof params.localField === 'string' ? params.localField : params.localField.alias]:
+            `$${typeof params.localField === 'string' ? params.localField : params.localField.ref}`,
+        },
         pipeline: lookup_pipeline,
         as: params.as,
       },
@@ -275,6 +295,23 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    *    projection: { _id: 0, name: 1, date: 1 },
    *    as: 'bookings',
    * })
+   *
+   * // In case you need to implement an alias for 'composed' localField
+   * // Just ensure to use the 'alias' property in the matchExpression object
+   *
+   * const pipeliner = new AggregationPipelineBuilder();
+   * const result = pipeliner
+   * .customLookup({
+   *  collectionName: 'authors',
+   *  localField: {
+   *    ref: 'author.refId',
+   *    alias: 'authorId',
+   *  },
+   *  matchExpression: { $eq: ['$_id', '$$authorId'] },
+   *  projection: { _id: 0, name: 1, date: 1 },
+   *  as: 'author',
+   * })
+   *
    */
   customUnwindLookup(params: ICustomLookupStageParams): AggregationPipelineBuilder {
     this.customLookup(params);

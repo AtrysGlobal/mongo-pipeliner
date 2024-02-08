@@ -19,3 +19,8 @@
 - Migrating tests from chai/mocha to jest
 - Including typings to npm package build
 - Migrating from ESModule to CommonJS
+
+## [0.1.4] - 2024-02-08
+
+- Enhance custom loookup tools
+- Adding Tests for custom lookup tools

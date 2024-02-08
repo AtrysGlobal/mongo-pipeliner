@@ -85,6 +85,41 @@ describe('Mongo Pipeliner Main Tests', () => {
     expect(result).toEqual(expectedPipeline);
   });
 
+  it('Custom Lookup pipeline with alias have expected structure', () => {
+    const expectedPipeline = [
+      {
+        $lookup: {
+          from: 'bookings',
+          let: { bookingId: '$bookingData.refId' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$bookingId'] } } },
+            { $project: { _id: 0, name: 1, date: 1 } },
+          ],
+          as: 'bookings',
+        },
+      },
+      { $unwind: { path: '$bookings', preserveNullAndEmptyArrays: true } },
+    ];
+
+    const pipeliner = new AggregationPipelineBuilder();
+    const result = pipeliner
+      .customUnwindLookup({
+        collectionName: 'bookings',
+        localField: {
+          ref: 'bookingData.refId',
+          alias: 'bookingId',
+        },
+        as: 'bookings',
+        matchExpression: { $eq: ['$_id', '$$bookingId'] },
+        projection: { _id: 0, name: 1, date: 1 },
+      })
+      .assemble();
+
+    expect(Array.isArray(result)).toBeTruthy();
+    expect(result.length).toEqual(expectedPipeline.length);
+    expect(result).toEqual(expectedPipeline);
+  });
+
   //Write another test for this
   it('Pipeline with pagination return filtered elements as expected', async () => {
     const pipeliner = new AggregationPipelineBuilder(User);
