@@ -1,6 +1,34 @@
 import { ICustomLookupStageParams, IDetailedAggregationPipelineBuilder, ILookupStageParams } from './types';
 import { Model, PipelineStage } from 'mongoose';
 
+// export abstract class BaseAggregationPipelineBuilder {
+//   match(match: { [k: string]: any }){
+//     throw new Error("Method not implemented");
+
+//   }
+// }
+
+export interface BaseAggregationPipelineBuilder extends AggregationPipelineBuilder {
+  match(match: { [k: string]: any }): BaseAggregationPipelineBuilder;
+  group(group: { _id: string; [k: string]: any }): BaseAggregationPipelineBuilder;
+  sort(sort: { [k: string]: 1 | -1 }): BaseAggregationPipelineBuilder;
+  limit(limit: number): BaseAggregationPipelineBuilder;
+  skip(skip: number): BaseAggregationPipelineBuilder;
+  set(payload: { [k: string]: any }): BaseAggregationPipelineBuilder;
+  unset(prop: string | string[]): BaseAggregationPipelineBuilder;
+  project(projection: { [k: string]: any }): BaseAggregationPipelineBuilder;
+  count(count: string): BaseAggregationPipelineBuilder;
+  facet(params: { [k: string]: any }): BaseAggregationPipelineBuilder;
+  out(collectionName: string): BaseAggregationPipelineBuilder;
+  lookup(params: ILookupStageParams): BaseAggregationPipelineBuilder;
+  customLookup(params: ICustomLookupStageParams): BaseAggregationPipelineBuilder;
+  customUnwindLookup(params: ICustomLookupStageParams): BaseAggregationPipelineBuilder;
+  paginate(limit: number, page: number): BaseAggregationPipelineBuilder;
+  execute(): Promise<any[]>;
+  assemble(reset?: boolean): PipelineStage[];
+  reset(): void;
+}
+
 /**
  * A class that helps you build aggregation pipelines.
  * It can be used in two ways:
@@ -26,7 +54,9 @@ import { Model, PipelineStage } from 'mongoose';
  * }
  *
  */
-export class AggregationPipelineBuilder implements IDetailedAggregationPipelineBuilder {
+export class AggregationPipelineBuilder<T extends BaseAggregationPipelineBuilder = BaseAggregationPipelineBuilder>
+  implements IDetailedAggregationPipelineBuilder<T>
+{
   protected pipeline: PipelineStage[];
   protected collection?: Model<any>;
 
@@ -40,12 +70,12 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * those that match the specified conditions.
    *
    * @param match - The query in the $match stage
-   * @returns {AggregationPipelineBuilder}
+   * @returns {}
    *
    */
-  match(match: { [k: string]: any }): AggregationPipelineBuilder {
+  match(match: { [k: string]: any }): T {
     this.pipeline.push({ $match: match });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -58,9 +88,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  group(group: { _id: string; [k: string]: any }): AggregationPipelineBuilder {
+  group(group: { _id: string; [k: string]: any }): T {
     this.pipeline.push({ $group: group });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -70,9 +100,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  sort(sort: { [k: string]: 1 | -1 }): AggregationPipelineBuilder {
+  sort(sort: { [k: string]: 1 | -1 }): T {
     this.pipeline.push({ $sort: sort });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -83,9 +113,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  limit(limit: number): AggregationPipelineBuilder {
+  limit(limit: number): T {
     this.pipeline.push({ $limit: limit });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -97,9 +127,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  skip(skip: number): AggregationPipelineBuilder {
+  skip(skip: number): T {
     this.pipeline.push({ $skip: skip });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -109,9 +139,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  set(payload: { [k: string]: any }): AggregationPipelineBuilder {
+  set(payload: { [k: string]: any }): T {
     this.pipeline.push({ $set: payload });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -121,9 +151,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  unset(prop: string | string[]): AggregationPipelineBuilder {
+  unset(prop: string | string[]): T {
     this.pipeline.push({ $unset: prop });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -134,9 +164,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  project(projection: { [k: string]: any }): AggregationPipelineBuilder {
+  project(projection: { [k: string]: any }): T {
     this.pipeline.push({ $project: projection });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -146,9 +176,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  count(count: string): AggregationPipelineBuilder {
+  count(count: string): T {
     this.pipeline.push({ $count: count });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -159,9 +189,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  facet(params: { [k: string]: any }): AggregationPipelineBuilder {
+  facet(params: { [k: string]: any }): T {
     this.pipeline.push({ $facet: params });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -173,9 +203,9 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  out(collectionName: string): AggregationPipelineBuilder {
+  out(collectionName: string): T {
     this.pipeline.push({ $out: collectionName });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -189,7 +219,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @returns {AggregationPipelineBuilder}
    *
    */
-  lookup(params: ILookupStageParams): AggregationPipelineBuilder {
+  lookup(params: ILookupStageParams): T {
     this.pipeline.push({
       $lookup: {
         from: params.from,
@@ -198,7 +228,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
         as: params.as,
       },
     });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -243,7 +273,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * })
    *
    */
-  customLookup(params: ICustomLookupStageParams): AggregationPipelineBuilder {
+  customLookup(params: ICustomLookupStageParams): T {
     const lookup_pipeline: any[] = [];
 
     if (params.matchExpression) {
@@ -265,7 +295,7 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
       },
     });
 
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -313,10 +343,10 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * })
    *
    */
-  customUnwindLookup(params: ICustomLookupStageParams): AggregationPipelineBuilder {
+  customUnwindLookup(params: ICustomLookupStageParams): T {
     this.customLookup(params);
     this.pipeline.push({ $unwind: { path: `$${params.as}`, preserveNullAndEmptyArrays: true } });
-    return this;
+    return this as unknown as T;
   }
 
   /**
@@ -327,10 +357,10 @@ export class AggregationPipelineBuilder implements IDetailedAggregationPipelineB
    * @param {number} page - The query in the $skip stage
    * @returns {AggregationPipelineBuilder}
    */
-  paginate(limit: number = 10, page: number = 1): AggregationPipelineBuilder {
+  paginate(limit: number = 10, page: number = 1): T {
     this.pipeline.push({ $skip: limit * (page - 1) });
     this.pipeline.push({ $limit: limit });
-    return this;
+    return this as unknown as T;
   }
 
   /**
