@@ -22,7 +22,7 @@ export interface IProtoPipelineBuilder {
   reset(): void;
 }
 
-export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
+export interface IAggregationPipelineBuilder<T> extends IProtoPipelineBuilder {
   /**
    * Filters the documents to pass only
    * those that match the specified conditions.
@@ -30,7 +30,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param match - The query in the $match stage
    *
    */
-  match(match: { [k: string]: any }): void;
+  match(match: { [k: string]: any }): T;
 
   /**
    * Groups documents by some specified key
@@ -41,7 +41,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param group - The query in the $group stage
    *
    */
-  group(group: { _id: string; [k: string]: any }): void;
+  group(group: { _id: string; [k: string]: any }): T;
 
   /**
    * Sort documents by one or more fields.
@@ -49,7 +49,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param sort - The query in the $sort stage
    *
    */
-  sort(sort: { [k: string]: 1 | -1 }): void;
+  sort(sort: { [k: string]: 1 | -1 }): T;
 
   /**
    * Limits the number of documents passed
@@ -58,7 +58,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {number} limit - The query in the $limit stage
    *
    */
-  limit(limit: number): void;
+  limit(limit: number): T;
 
   /**
    * Skips over a specified number of documents
@@ -68,7 +68,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {number} skip - The query in the $skip stage
    *
    */
-  skip(skip: number): void;
+  skip(skip: number): T;
 
   /**
    * Adds new fields to documents.
@@ -76,7 +76,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {*} payload - The query in the $set stage
    *
    */
-  set(payload: { [k: string]: any }): void;
+  set(payload: { [k: string]: any }): T;
 
   /**
    * Removes/excludes fields from documents.
@@ -84,7 +84,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {string | string[]} prop - The query in the $unset stage
    *
    */
-  unset(prop: string | string[]): void;
+  unset(prop: string | string[]): T;
 
   /**
    * Reshapes each document in the stream,
@@ -93,7 +93,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param projection - The query in the $project stage
    *
    */
-  project(projection: { [k: string]: any }): void;
+  project(projection: { [k: string]: any }): T;
 
   /**
    * Counts the number of documents input to the stage.
@@ -101,7 +101,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    * @param {string} count - The query in the $count stage
    *
    */
-  count(count: string): void;
+  count(count: string): T;
 
   /**
    * Writes the resulting documents of the aggregation pipeline
@@ -110,7 +110,7 @@ export interface IAggregationPipelineBuilder extends IProtoPipelineBuilder {
    *
    * @param {string} collectionName - The query in the $out stage
    */
-  out(collectionName: string): void;
+  out(collectionName: string): T;
 }
 
 export interface ILookupStageParams {
@@ -128,14 +128,14 @@ export interface ICustomLookupStageParams {
   as: string;
 }
 
-export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelineBuilder {
+export interface IDetailedAggregationPipelineBuilder<T> extends IAggregationPipelineBuilder<T> {
   /**
    * Perform a join with another collection.
    * It can be used to combine documents from two collections.
    *
    * @param params - The query in the $lookup stage
    */
-  lookup(params: ILookupStageParams): void;
+  lookup(params: ILookupStageParams): T;
 
   /**
    * Process a set of input documents in multiple different ways,
@@ -143,7 +143,7 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    *
    * @param params - The query in the $lookup stage
    */
-  facet(params: { [k: string]: any }): void;
+  facet(params: { [k: string]: any }): T;
 
   /**
    * Perform a join with another collection.
@@ -187,7 +187,7 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    * })
    *
    */
-  customLookup(params: ICustomLookupStageParams): void;
+  customLookup(params: ICustomLookupStageParams): T;
 
   /**
    * Perform a join with another collection.
@@ -234,7 +234,7 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    * })
    *
    */
-  customUnwindLookup(params: ICustomLookupStageParams): void;
+  customUnwindLookup(params: ICustomLookupStageParams): T;
 
   /**
    * Builds a pipeline that will paginate the results
@@ -244,5 +244,5 @@ export interface IDetailedAggregationPipelineBuilder extends IAggregationPipelin
    * @param {number} page - The query in the $skip stage
    *
    */
-  paginate(limit: number, page: number): void;
+  paginate(limit: number, page: number): T;
 }

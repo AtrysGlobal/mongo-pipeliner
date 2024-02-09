@@ -24,3 +24,8 @@
 
 - Enhance custom loookup tools
 - Adding Tests for custom lookup tools
+
+## [0.1.6] - 2024-02-09
+
+- Adding dynamic typing to pipeline builder and interfaces
+- Adding tests for dynamic typing

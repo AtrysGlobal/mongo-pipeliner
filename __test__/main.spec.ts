@@ -101,7 +101,7 @@ describe('Mongo Pipeliner Main Tests', () => {
       { $unwind: { path: '$bookings', preserveNullAndEmptyArrays: true } },
     ];
 
-    const pipeliner = new AggregationPipelineBuilder();
+    const pipeliner = new AggregationPipelineBuilder<any>();
     const result = pipeliner
       .customUnwindLookup({
         collectionName: 'bookings',
@@ -130,5 +130,55 @@ describe('Mongo Pipeliner Main Tests', () => {
     expect(paginatedResult.length).toEqual(10);
     expect(paginatedResult[0]).toHaveProperty('is_verified');
     expect(paginatedResult[0].is_verified).toBeTruthy();
+  });
+
+  it('Pipeline builder heritage works as expected', async () => {
+    const expectedPipeline = [
+      { $match: { is_verified: true } },
+      {
+        $lookup: {
+          from: 'bookings',
+          let: { bookingId: '$bookingId' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$bookingId'] } } },
+            { $project: { _id: 0, name: 1, date: 1 } },
+          ],
+          as: 'bookings',
+        },
+      },
+      { $unwind: { path: '$bookings', preserveNullAndEmptyArrays: true } },
+      { $group: { _id: 'gender', total: { $sum: 1 } } },
+      { $set: { total: '$total' } },
+      { $unset: '_id' },
+    ];
+
+    class CustomBuilder extends AggregationPipelineBuilder<CustomBuilder> {
+      constructor(model: mongoose.Model<any>) {
+        super(model);
+      }
+
+      public firstStep(): CustomBuilder {
+        return this.match({ is_verified: true })
+          .customUnwindLookup({
+            collectionName: 'bookings',
+            localField: 'bookingId',
+            as: 'bookings',
+            matchExpression: { $eq: ['$_id', '$$bookingId'] },
+            projection: { _id: 0, name: 1, date: 1 },
+          })
+          .group({ _id: 'gender', total: { $sum: 1 } });
+      }
+
+      public secondStep(): CustomBuilder {
+        return this.set({ total: '$total' }).unset('_id');
+      }
+    }
+
+    const pipeliner = new CustomBuilder(User);
+    const result = pipeliner.firstStep().secondStep().assemble();
+
+    expect(Array.isArray(result)).toBeTruthy();
+    expect(result.length).toEqual(expectedPipeline.length);
+    expect(result).toEqual(expectedPipeline);
   });
 });

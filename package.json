@@ -1,6 +1,6 @@
 {
   "name": "mongo-pipeliner",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "A practical and userful set of tools to help you build and test MongoDB aggregation pipelines.",
   "keywords": [
     "mongodb",
@@ -23,7 +23,7 @@
     "build": "tsc",
     "lint": "eslint",
     "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint && npm test",
+    "preversion": "npm run lint && npm test && npm run build",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
