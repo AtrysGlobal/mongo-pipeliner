@@ -29,3 +29,8 @@
 
 - Adding dynamic typing to pipeline builder and interfaces
 - Adding tests for dynamic typing
+
+## [0.1.7] - 2024-02-13
+
+- Adding `merge`, `addFields`, `unwind`, `unionWith` and `addCustom` stages to pipeline builder
+- Adding tests for new stages

@@ -128,6 +128,13 @@ export interface ICustomLookupStageParams {
   as: string;
 }
 
+export interface IMergeStageParams {
+  into: string | { db: string; coll: string };
+  on?: string;
+  whenMatched?: 'replace' | 'keepExisting' | 'merge' | 'fail';
+  whenNotMatched?: 'insert' | 'discard' | 'fail';
+}
+
 export interface IDetailedAggregationPipelineBuilder<T> extends IAggregationPipelineBuilder<T> {
   /**
    * Perform a join with another collection.
@@ -245,4 +252,70 @@ export interface IDetailedAggregationPipelineBuilder<T> extends IAggregationPipe
    *
    */
   paginate(limit: number, page: number): T;
+
+  /**
+   * Allows you to add a custom stage to the pipeline.
+   *
+   * NOTE: This method is not type-safe and should be used with caution.
+   *
+   * @param {PipelineStage} stage - The custom stage to add to the pipeline
+   * @returns {AggregationPipelineBuilder}
+   */
+  addCustom(stage: PipelineStage): T;
+
+  /**
+   * Adds new fields to documents. $addFields outputs documents that contain all
+   * existing fields from the input documents and newly added fields.
+   *
+   * @param {object} fields - The fields to add
+   * @returns {AggregationPipelineBuilder}
+   */
+  addFields(fields: { [k: string]: any }): T;
+
+  /**
+   * Deconstructs an array field from the input documents to output a document
+   * for each element.
+   * Each output document is the input document with the value of the array
+   * field replaced by the element.
+   *
+   * @param {string} path                        - Path to unwind
+   * @param {boolean} preserveNullAndEmptyArrays - If true, if the path is null or empty, it will be preserved
+   * @returns {AggregationPipelineBuilder}
+   */
+  unwind(path: string, preserveNullAndEmptyArrays: boolean): T;
+
+  /**
+   * Writes the resulting documents of the aggregation pipeline
+   * to a collection. The stage can incorporate the results
+   * into an existing collection or write to a new collection.
+   *
+   * IMPORTANT:
+   *
+   * - If the collection does not exist, the $merge stage creates the collection.
+   * - If the collection does exist, the $merge stage combines the documents from the input
+   * and the specified collection.
+   *
+   * @param {string} into           - Into which collection the results will be written
+   * @param {string} on             - Optional. Field or fields that act as a unique identifier
+   *                                  for a document.
+   * @param {string} whenMatched    - Optional. The behavior of $merge if a result document and
+   *                                  an existing document in the collection have the same value
+   *                                  for the specified on field(s).
+   * @param {string} whenNotMatched - Optional. The behavior of $merge if a result document does
+   *                                  not match an existing document in the out collection.
+   * @returns {AggregationPipelineBuilder}
+   */
+  merge(params: IMergeStageParams): T;
+
+  /**
+   * Performs a union of two collections. $unionWith combines pipeline results from two collections
+   * into a single result set. The stage outputs the combined result set (including duplicates)
+   * to the next stage.
+   *
+   * @param {string} collectionName - The name of the collection to union with
+   * @param {any[]} pipeline        - The pipeline to execute on the unioned collection
+   *
+   * @returns {AggregationPipelineBuilder}
+   */
+  unionWith(collectionName: string, pipeline: any[]): T;
 }
