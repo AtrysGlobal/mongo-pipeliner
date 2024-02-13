@@ -1,4 +1,9 @@
-import { ICustomLookupStageParams, IDetailedAggregationPipelineBuilder, ILookupStageParams } from './types';
+import {
+  ICustomLookupStageParams,
+  IDetailedAggregationPipelineBuilder,
+  ILookupStageParams,
+  IMergeStageParams,
+} from './types';
 import { Model, PipelineStage } from 'mongoose';
 
 // export abstract class BaseAggregationPipelineBuilder {
@@ -24,6 +29,13 @@ export interface BaseAggregationPipelineBuilder extends AggregationPipelineBuild
   customLookup(params: ICustomLookupStageParams): BaseAggregationPipelineBuilder;
   customUnwindLookup(params: ICustomLookupStageParams): BaseAggregationPipelineBuilder;
   paginate(limit: number, page: number): BaseAggregationPipelineBuilder;
+
+  addCustom(stage: PipelineStage): BaseAggregationPipelineBuilder;
+  addFields(fields: { [k: string]: any }): BaseAggregationPipelineBuilder;
+  unwind(path: string, preserveNullAndEmptyArrays: boolean): BaseAggregationPipelineBuilder;
+  merge(params: IMergeStageParams): BaseAggregationPipelineBuilder;
+  unionWith(collectionName: string, pipeline: any[]): BaseAggregationPipelineBuilder;
+
   execute(): Promise<any[]>;
   assemble(reset?: boolean): PipelineStage[];
   reset(): void;
@@ -209,13 +221,61 @@ export class AggregationPipelineBuilder<T extends BaseAggregationPipelineBuilder
   }
 
   /**
+   * Writes the resulting documents of the aggregation pipeline
+   * to a collection. The stage can incorporate the results
+   * into an existing collection or write to a new collection.
+   *
+   * IMPORTANT:
+   *
+   * - If the collection does not exist, the $merge stage creates the collection.
+   * - If the collection does exist, the $merge stage combines the documents from the input
+   * and the specified collection.
+   *
+   * @param {string} into           - Into which collection the results will be written
+   * @param {string} on             - Optional. Field or fields that act as a unique identifier
+   *                                  for a document.
+   * @param {string} whenMatched    - Optional. The behavior of $merge if a result document and
+   *                                  an existing document in the collection have the same value
+   *                                  for the specified on field(s).
+   * @param {string} whenNotMatched - Optional. The behavior of $merge if a result document does
+   *                                  not match an existing document in the out collection.
+   * @returns {AggregationPipelineBuilder}
+   */
+  merge(params: IMergeStageParams): T {
+    this.pipeline.push({
+      $merge: {
+        into: params.into,
+        on: params.on,
+        whenMatched: params.whenMatched || 'merge',
+        whenNotMatched: params.whenNotMatched || 'insert',
+      },
+    });
+    return this as unknown as T;
+  }
+
+  /**
+   * Performs a union of two collections. $unionWith combines pipeline results from two collections
+   * into a single result set. The stage outputs the combined result set (including duplicates)
+   * to the next stage.
+   *
+   * @param {string} collectionName - The name of the collection to union with
+   * @param {any[]} pipeline        - The pipeline to execute on the unioned collection
+   *
+   * @returns {AggregationPipelineBuilder}
+   */
+  unionWith(collectionName: string, pipeline: any[]): T {
+    this.pipeline.push({ $unionWith: { coll: collectionName, pipeline } });
+    return this as unknown as T;
+  }
+
+  /**
    * Perform a join with another collection.
    * It can be used to combine documents from two collections.
    *
-   * @param {string} from - Collection to join
-   * @param {string} localField - Field from the input documents
+   * @param {string} from         - Collection to join
+   * @param {string} localField   - Field from the input documents
    * @param {string} foreignField - Field from the documents of the "from" collection
-   * @param {string} as - Name of the new array field to add to the input documents
+   * @param {string} as           - Name of the new array field to add to the input documents
    * @returns {AggregationPipelineBuilder}
    *
    */
@@ -228,6 +288,33 @@ export class AggregationPipelineBuilder<T extends BaseAggregationPipelineBuilder
         as: params.as,
       },
     });
+    return this as unknown as T;
+  }
+
+  /**
+   * Deconstructs an array field from the input documents to output a document
+   * for each element.
+   * Each output document is the input document with the value of the array
+   * field replaced by the element.
+   *
+   * @param {string} path                        - Path to unwind
+   * @param {boolean} preserveNullAndEmptyArrays - If true, if the path is null or empty, it will be preserved
+   * @returns {AggregationPipelineBuilder}
+   */
+  unwind(path: string, preserveNullAndEmptyArrays: boolean = false): T {
+    this.pipeline.push({ $unwind: { path, preserveNullAndEmptyArrays } });
+    return this as unknown as T;
+  }
+
+  /**
+   * Adds new fields to documents. $addFields outputs documents that contain all
+   * existing fields from the input documents and newly added fields.
+   *
+   * @param {object} fields - The fields to add
+   * @returns {AggregationPipelineBuilder}
+   */
+  addFields(fields: { [k: string]: any }): T {
+    this.pipeline.push({ $addFields: fields });
     return this as unknown as T;
   }
 
@@ -360,6 +447,19 @@ export class AggregationPipelineBuilder<T extends BaseAggregationPipelineBuilder
   paginate(limit: number = 10, page: number = 1): T {
     this.pipeline.push({ $skip: limit * (page - 1) });
     this.pipeline.push({ $limit: limit });
+    return this as unknown as T;
+  }
+
+  /**
+   * Allows you to add a custom stage to the pipeline.
+   *
+   * NOTE: This method is not type-safe and should be used with caution.
+   *
+   * @param {PipelineStage} stage - The custom stage to add to the pipeline
+   * @returns {AggregationPipelineBuilder}
+   */
+  addCustom(stage: PipelineStage): T {
+    this.pipeline.push(stage);
     return this as unknown as T;
   }
 

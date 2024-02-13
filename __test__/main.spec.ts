@@ -181,4 +181,31 @@ describe('Mongo Pipeliner Main Tests', () => {
     expect(result.length).toEqual(expectedPipeline.length);
     expect(result).toEqual(expectedPipeline);
   });
+
+  it('AddFields and merge operators are built as expected.', () => {
+    const expectedPipeline = [
+      { $addFields: { newField: 'myvalue' } },
+      {
+        $merge: {
+          into: { db: 'sharded_db1', coll: 'sharded_coll1' },
+          whenMatched: 'keepExisting',
+          whenNotMatched: 'insert',
+        },
+      },
+    ];
+
+    const pipeliner = new AggregationPipelineBuilder();
+    const result = pipeliner
+      .addFields({ newField: 'myvalue' })
+      .merge({
+        into: { db: 'sharded_db1', coll: 'sharded_coll1' },
+        whenMatched: 'keepExisting',
+        whenNotMatched: 'insert',
+      })
+      .assemble();
+
+    expect(Array.isArray(result)).toBeTruthy();
+    expect(result.length).toEqual(expectedPipeline.length);
+    expect(result).toEqual(expectedPipeline);
+  });
 });
